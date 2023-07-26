@@ -1,32 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { postCreateUser } from '../service/UseService';
+import { updateUser } from '../service/UseService';
 
-function ModalAddNew(props) {
-    const { handleClose, show, handleUpdateTable } = props;
+function ModalEdit(props) {
+    const { handleClose, show, dataUserEdit, handleSaveEdit } = props;
     const [name, setName] = useState('');
     const [job, setJob] = useState('');
 
-    const handleSaveUser = async () => {
-        let res = await postCreateUser(name, job);
-
-        if (res && res.id) {
-            // success
-            handleClose();
-            setName('');
-            setJob('');
-            handleUpdateTable({
+    const handleEditUser = async () => {
+        let res = await updateUser(name, job);
+        if (res && res.updatedAt) {
+            handleSaveEdit({
                 first_name: name,
-                id: res.id,
+                id: dataUserEdit.id,
             });
+            handleClose();
         }
     };
+
+    useEffect(() => {
+        if (show) {
+            setName(dataUserEdit.first_name);
+        }
+    }, [dataUserEdit]);
 
     return (
         <>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add New User</Modal.Title>
+                    <Modal.Title>Edit New User</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="body-add-new">
@@ -60,8 +62,8 @@ function ModalAddNew(props) {
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={() => handleSaveUser()}>
-                        Save User
+                    <Button variant="primary" onClick={() => handleEditUser()}>
+                        Confirm
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -69,4 +71,4 @@ function ModalAddNew(props) {
     );
 }
 
-export default ModalAddNew;
+export default ModalEdit;
