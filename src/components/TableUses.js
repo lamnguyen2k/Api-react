@@ -1,9 +1,11 @@
 import Table from 'react-bootstrap/Table';
 import ReactPaginate from 'react-paginate';
 import ModalAddNew from './ModalAddNew';
+import ModalEdit from './ModalEdit';
+import ModalConfirm from './ModalConfirm';
+
 import { useEffect, useState } from 'react';
 import { fetchAllUser } from '../service/UseService';
-import ModalEdit from './ModalEdit';
 import _ from 'lodash';
 
 function TableUses({ props }) {
@@ -15,9 +17,13 @@ function TableUses({ props }) {
     const [showModalEdit, setShowModalEdit] = useState(false);
     const [dataUserEdit, setDataUserEdit] = useState({});
 
+    const [showModalDelete, setShowModalDelete] = useState(false);
+    const [dataUserDelete, setDataUserDelete] = useState({});
+
     const handleClose = () => {
         setShowModalAddNew(false);
         setShowModalEdit(false);
+        setShowModalDelete(false);
     };
 
     const handleUpdateTable = (user) => {
@@ -33,6 +39,19 @@ function TableUses({ props }) {
         let cloneListUsers = _.cloneDeep(listUsers);
         let index = listUsers.findIndex((item) => item.id === user.id);
         cloneListUsers[index].first_name = user.first_name;
+        setListUsers(cloneListUsers);
+    };
+
+    const handleDelete = (user) => {
+        setShowModalDelete(true);
+        setDataUserDelete(user);
+    };
+
+    const handleDeleteUser = (user) => {
+        let cloneListUsers = _.cloneDeep(listUsers);
+
+        cloneListUsers = cloneListUsers.filter((item) => item.id !== user.id);
+
         setListUsers(cloneListUsers);
     };
 
@@ -94,7 +113,10 @@ function TableUses({ props }) {
                                     >
                                         Edit
                                     </button>
-                                    <button className="btn btn-danger">
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleDelete(item)}
+                                    >
                                         Delete
                                     </button>
                                 </td>
@@ -130,6 +152,12 @@ function TableUses({ props }) {
                 dataUserEdit={dataUserEdit}
                 handleClose={handleClose}
                 handleSaveEdit={handleSaveEdit}
+            />
+            <ModalConfirm
+                show={showModalDelete}
+                handleClose={handleClose}
+                dataUserDelete={dataUserDelete}
+                handleDeleteUser={handleDeleteUser}
             />
         </>
     );
